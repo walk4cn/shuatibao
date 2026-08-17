@@ -201,7 +201,7 @@ create policy "own data" on public.sync_data
       </div>
     </div>
     <div class="fmt">
-      <b>账号登录</b><span style="color:var(--sub)">（多终端使用同一邮箱账号即可互通同步）</span>
+      <b>账号登录</b><span style="color:var(--sub)">（多终端使用同一邮箱账号即可互通同步：题库、当前选择、考试记录、错题集）</span>
       <label style="display:block;margin:8px 0">邮箱
         <input id="syncEmail" type="email" style="width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px" placeholder="you@example.com"></label>
       <label style="display:block;margin:8px 0">密码
@@ -351,12 +351,17 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 <script>
 (function(){
 "use strict";
-var LS_KEY="shuati_bank_v1",LS_BANKS="shuati_banks_v1",LS_SEL="shuati_sel_v1";
+var LS_KEY="shuati_bank_v1",LS_BANKS="shuati_banks_v1",LS_SEL="shuati_sel_v1",LS_PRAC="shuati_prac_v1";
 function loadBanks(){try{return JSON.parse(localStorage.getItem(LS_BANKS))||[]}catch(e){return[]}}
 function saveBanks(a){localStorage.setItem(LS_BANKS,JSON.stringify(a));markDirty("banks")}
 function getBank(id){return loadBanks().find(function(b){return b.id===id})}
 var TYPE_LABEL={single:"单选",multiple:"多选",judge:"判断",fill:"填空"};
 var App={bank:null,selectedBankId:null,session:null,sel:new Set(),userText:"",submitted:false,prac:{results:{},wrongIds:new Set()}};
+/* 错题集持久化（按题库） */
+function loadPracMap(){try{return JSON.parse(localStorage.getItem(LS_PRAC))||{}}catch(e){return{}}}
+function savePracMap(m){localStorage.setItem(LS_PRAC,JSON.stringify(m));markDirty("wrong")}
+function commitPrac(){if(!App.selectedBankId)return;var m=loadPracMap();m[App.selectedBankId]={results:App.prac.results,wrongIds:[...App.prac.wrongIds]};savePracMap(m)}
+function loadPracFor(bankId){var m=loadPracMap(),p=m[bankId]||{results:{},wrongIds:[]};App.prac={results:p.results||{},wrongIds:new Set(p.wrongIds||[])}}
 
 var $=function(id){return document.getElementById(id)};
 function esc(s){return String(s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]})}
@@ -424,7 +429,7 @@ function openExamWrong(id,returnTo){
 function selectBank(id){
   var b=getBank(id);if(!b)return;
   App.bank=b;App.selectedBankId=id;
-  App.prac={results:{},wrongIds:new Set()};
+  loadPracFor(id);
   localStorage.setItem(LS_SEL,id);markDirty("sel");
   refreshHeaderButtons();renderHome();
 }
@@ -432,6 +437,7 @@ function delBank(id){
   if(!confirm("确定删除该题库？"))return;
   var banks=loadBanks().filter(function(x){return x.id!==id});
   saveBanks(banks);
+  var m=loadPracMap();if(m[id]){delete m[id];savePracMap(m)}
   if(App.selectedBankId===id){App.bank=null;App.selectedBankId=null;localStorage.removeItem(LS_SEL)}
   refreshHeaderButtons();renderHome();
 }
@@ -597,7 +603,7 @@ function buildOrder(onlyWrong){
   var idx=App.bank.questions.map(function(_,i){return i});
   var tf=$("typeSel")?$("typeSel").value:"all";
   if(tf&&tf!=="all")idx=idx.filter(function(i){return App.bank.questions[i].type===tf});
-  if(onlyWrong&&App.session){var w=App.session.wrongIds;idx=idx.filter(function(i){return w.has(i)})}
+  if(onlyWrong){var w=App.session&&App.session.mode==="exam"?App.session.wrongIds:App.prac.wrongIds;idx=idx.filter(function(i){return w.has(i)})}
   if($("shuffleChk").checked)idx=idx.sort(function(){return Math.random()-0.5});
   return idx;
 }
@@ -605,8 +611,8 @@ function startSession(onlyWrong){
   if(!App.bank){toast("请先选择题库");return}
   var order=buildOrder(onlyWrong);
   if(!order.length){toast("没有符合条件的题目");return}
-  if(onlyWrong)order.forEach(function(i){delete App.prac.results[i];App.prac.wrongIds.delete(i)});
-  else App.prac={results:{},wrongIds:new Set()};
+  if(onlyWrong){order.forEach(function(i){delete App.prac.results[i]});commitPrac()}
+  else App.prac={results:{},wrongIds:App.prac.wrongIds};
   App.session={order:order,pos:0,correct:0,wrong:0,answered:new Set(),wrongIds:new Set(),results:{},mode:"practice"};
   App.submitted=false;App.sel=new Set();App.userText="";
   $("ctrls").style.display="";
@@ -617,7 +623,7 @@ function restartSession(onlyWrong){
   if(!App.bank){toast("请先选择题库");return}
   var order=buildOrder(onlyWrong);
   if(!order.length){toast("没有符合条件的题目");return}
-  if(onlyWrong)order.forEach(function(i){delete App.prac.results[i];App.prac.wrongIds.delete(i)});
+  if(onlyWrong){order.forEach(function(i){delete App.prac.results[i]});commitPrac()}
   var results={},answered=new Set(),wrongIds=new Set(),correct=0,wrong=0;
   order.forEach(function(i){
     var r=App.prac.results[i];
@@ -706,6 +712,7 @@ function submit(){
   if(correct)App.session.correct++;else{App.session.wrong++;App.session.wrongIds.add(idx)}
   App.prac.results[idx]=res;
   if(correct)App.prac.wrongIds.delete(idx);else App.prac.wrongIds.add(idx);
+  commitPrac();
   App.submitted=true;applyFeedback(q,res);updateTop();updateNav();
   $("answerBtn").disabled=true;$("submitBtn").textContent="下一题 ▶";
   if(App.session.mode==="exam"||$("autoChk").checked)setTimeout(next,900);
@@ -717,6 +724,7 @@ function reveal(){
   App.session.results[idx]=res;App.session.answered.add(idx);
   App.session.wrong++;App.session.wrongIds.add(idx);
   App.prac.results[idx]=res;App.prac.wrongIds.add(idx);
+  commitPrac();
   App.submitted=true;App.sel=new Set();
   applyFeedback(q,res);updateTop();updateNav();
   $("answerBtn").disabled=true;$("submitBtn").textContent="下一题 ▶";
@@ -771,7 +779,7 @@ function finish(){
     var rec={id:Date.now()+"_"+Math.random().toString(36).slice(2,7),time:new Date().toISOString(),earned:earned,max:max,pct:pct,total:total,right:right,wrong:wrong};
     var hist=loadHistory();hist.unshift(rec);saveHistory(hist);refreshHeaderButtons();
     App.lastExamId=rec.id;
-    $("doneScore").textContent=earned+"/"+max;$("doneLine").textContent="模拟考试完成！得分率 "+pct+"%（答对 "+right+"/"+total+" 题）";
+    $("doneScore").textContent=earned;$("doneLine").innerHTML="模拟考试完成！得分 "+earned+"（答对 "+right+"/"+total+" 题）· "+(pct>=80?'<b style="color:var(--ok)">考试合格</b>':'<b style="color:var(--err)">考试不合格</b>');
     $("doneOk").textContent=right;$("doneNo").textContent=total-right;$("doneTotal").textContent=total;
     $("wrongAgainBtn").style.display="none";$("examWrongBtn").classList.remove("hidden");$("historyBtn").classList.remove("hidden");
     show("doneView");return;
@@ -797,7 +805,7 @@ function downloadTemplate(){
 }
 
 /* ===== Supabase 云同步 ===== */
-var LS_SYNC="shuati_sync_v1",SYNC_KEYS=["banks","sel","history"],SYNC_LOCAL={banks:LS_BANKS,sel:LS_SEL,history:EXAM_HISTORY_KEY};
+var LS_SYNC="shuati_sync_v1",SYNC_KEYS=["banks","sel","history","wrong"],SYNC_LOCAL={banks:LS_BANKS,sel:LS_SEL,history:EXAM_HISTORY_KEY,wrong:LS_PRAC};
 function loadSync(){try{return JSON.parse(localStorage.getItem(LS_SYNC))||{}}catch(e){return{}}}
 function saveSync(o){localStorage.setItem(LS_SYNC,JSON.stringify(o));return o}
 function syncBase(cfg){return cfg.url.replace(/\/+$/,"")}
@@ -895,14 +903,16 @@ function syncNow(silent){
     saveSync(cfg);
     return Promise.all(pushes).then(function(){
       if(applied.length){
-        toast("已从云端更新："+applied.join("、"));
+        var LABEL={banks:"题库",sel:"当前选择",history:"考试记录",wrong:"错题集"};
+        toast("已从云端更新："+applied.map(function(k){return LABEL[k]||k}).join("、"));
         if(applied.indexOf("sel")>=0){
           var sel=localStorage.getItem(LS_SEL);
           if(sel&&getBank(sel)){App.selectedBankId=sel;App.bank=getBank(sel)}
         }
+        if(applied.indexOf("wrong")>=0&&App.selectedBankId)loadPracFor(App.selectedBankId);
         renderHome();refreshHeaderButtons();
       }
-      syncSetStatus(applied.length?("已同步（更新 "+applied.join("、")+"）"):"已同步","ok");
+      syncSetStatus(applied.length?("已同步（更新 "+applied.map(function(k){return LABEL[k]||k}).join("、")+"）"):"已同步","ok");
       return true;
     });
   }).catch(function(err){
@@ -1000,7 +1010,7 @@ function init(){
   }
   // 恢复上次选择
   var sel=localStorage.getItem(LS_SEL);
-  if(sel&&getBank(sel)){App.selectedBankId=sel;App.bank=getBank(sel)}
+  if(sel&&getBank(sel)){App.selectedBankId=sel;App.bank=getBank(sel);loadPracFor(sel)}
   renderHome();refreshHeaderButtons();show("homeView");
   syncInit();
 }
