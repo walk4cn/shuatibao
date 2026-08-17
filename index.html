@@ -101,6 +101,7 @@ header .spacer{flex:1}
   <button class="btn ghost hidden" id="practiceBtn">题库练习</button>
   <button class="btn ghost hidden" id="examBtn">模拟考试</button>
   <button class="btn ghost hidden" id="histBtn">历史成绩</button>
+  <button class="btn ghost" id="syncBtn">☁ 同步</button>
 </header>
 
 <div class="wrap">
@@ -122,6 +123,52 @@ header .spacer{flex:1}
     <div id="homeEmpty" style="text-align:center;color:var(--sub);padding:40px 0">
       <div style="font-size:42px">📚</div>
       <p style="margin-top:8px">还没有题库，点击上方「导入新题库」开始吧</p>
+    </div>
+  </div>
+
+  <!-- 云同步页 -->
+  <div id="syncView" class="card hidden">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+      <h2 style="margin:0;font-size:20px;font-weight:700">☁ 云同步</h2>
+      <span class="grow"></span>
+      <button class="btn" id="syncBackBtn">← 返回</button>
+    </div>
+    <div class="fmt">
+      <b>连接设置</b>
+      <p style="color:var(--sub);margin:6px 0 10px">在 supabase.com 创建项目，执行下方建表 SQL 后，填入 Project URL 和 anon public key（Dashboard → Settings → API）。</p>
+      <label style="display:block;margin:8px 0">Project URL
+        <input id="syncUrl" style="width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px" placeholder="https://xxxxxxxx.supabase.co"></label>
+      <label style="display:block;margin:8px 0">anon public key
+        <input id="syncKey" style="width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px" placeholder="eyJhbGciOiJIUzI1NiIs..." ></label>
+      <div class="fmt" style="margin-top:12px">
+        <b>建表 SQL</b>（在 Supabase SQL Editor 中执行一次即可）
+        <pre style="background:var(--soft);padding:10px;border-radius:8px;overflow-x:auto;font-size:12px;line-height:1.5">create table if not exists public.sync_data (
+  user_id uuid not null references auth.users(id) on delete cascade,
+  data_key text not null,
+  payload jsonb not null default '{}'::jsonb,
+  updated_at timestamptz not null default now(),
+  primary key (user_id, data_key)
+);
+alter table public.sync_data enable row level security;
+create policy "own data" on public.sync_data
+  for all to authenticated
+  using (auth.uid() = user_id)
+  with check (auth.uid() = user_id);</pre>
+      </div>
+    </div>
+    <div class="fmt">
+      <b>账号登录</b><span style="color:var(--sub)">（多终端使用同一邮箱账号即可互通同步）</span>
+      <label style="display:block;margin:8px 0">邮箱
+        <input id="syncEmail" type="email" style="width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px" placeholder="you@example.com"></label>
+      <label style="display:block;margin:8px 0">密码
+        <input id="syncPass" type="password" style="width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px" placeholder="至少 6 位"></label>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
+        <button class="btn primary" id="syncSignupBtn">注册并登录</button>
+        <button class="btn" id="syncLoginBtn">登录</button>
+        <button class="btn ghost" id="syncLogoutBtn">退出登录</button>
+        <button class="btn ghost" id="syncNowBtn">立即同步</button>
+      </div>
+      <p id="syncStatus" style="margin-top:10px;color:var(--sub)"></p>
     </div>
   </div>
 
@@ -262,7 +309,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 "use strict";
 var LS_KEY="shuati_bank_v1",LS_BANKS="shuati_banks_v1",LS_SEL="shuati_sel_v1";
 function loadBanks(){try{return JSON.parse(localStorage.getItem(LS_BANKS))||[]}catch(e){return[]}}
-function saveBanks(a){localStorage.setItem(LS_BANKS,JSON.stringify(a))}
+function saveBanks(a){localStorage.setItem(LS_BANKS,JSON.stringify(a));markDirty("banks")}
 function getBank(id){return loadBanks().find(function(b){return b.id===id})}
 var TYPE_LABEL={single:"单选",multiple:"多选",judge:"判断",fill:"填空"};
 var App={bank:null,selectedBankId:null,session:null,sel:new Set(),userText:"",submitted:false,prac:{results:{},wrongIds:new Set()}};
@@ -270,12 +317,12 @@ var App={bank:null,selectedBankId:null,session:null,sel:new Set(),userText:"",su
 var $=function(id){return document.getElementById(id)};
 function esc(s){return String(s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]})}
 function toast(msg){var t=$("toast");t.textContent=msg;t.classList.add("show");clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove("show")},1800)}
-function show(view){["homeView","importView","studyView","doneView","historyView","examWrongView"].forEach(function(v){$(v).classList.toggle("hidden",v!==view)})}
+function show(view){["homeView","importView","studyView","doneView","historyView","examWrongView","syncView"].forEach(function(v){$(v).classList.toggle("hidden",v!==view)})}
 
 /* 历史成绩 */
 var EXAM_HISTORY_KEY="shuati_exam_history_v1";
 function loadHistory(){try{return JSON.parse(localStorage.getItem(EXAM_HISTORY_KEY))||[]}catch(e){return[]}}
-function saveHistory(arr){localStorage.setItem(EXAM_HISTORY_KEY,JSON.stringify(arr))}
+function saveHistory(arr){localStorage.setItem(EXAM_HISTORY_KEY,JSON.stringify(arr));markDirty("history")}
 function fmtTime(d){var p=function(n){return String(n).padStart(2,"0")};return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate())+" "+p(d.getHours())+":"+p(d.getMinutes())}
 function refreshHeaderButtons(){
   var hasBank=!!App.bank,hasHist=loadHistory().length>0;
@@ -334,7 +381,7 @@ function selectBank(id){
   var b=getBank(id);if(!b)return;
   App.bank=b;App.selectedBankId=id;
   App.prac={results:{},wrongIds:new Set()};
-  localStorage.setItem(LS_SEL,id);
+  localStorage.setItem(LS_SEL,id);markDirty("sel");
   refreshHeaderButtons();renderHome();
 }
 function delBank(id){
@@ -705,6 +752,146 @@ function downloadTemplate(){
   XLSX.utils.book_append_sheet(wb,ws,"题库");XLSX.writeFile(wb,"题库模板.xlsx");
 }
 
+/* ===== Supabase 云同步 ===== */
+var LS_SYNC="shuati_sync_v1",SYNC_KEYS=["banks","sel","history"],SYNC_LOCAL={banks:LS_BANKS,sel:LS_SEL,history:EXAM_HISTORY_KEY};
+function loadSync(){try{return JSON.parse(localStorage.getItem(LS_SYNC))||{}}catch(e){return{}}}
+function saveSync(o){localStorage.setItem(LS_SYNC,JSON.stringify(o));return o}
+function syncBase(cfg){return cfg.url.replace(/\/+$/,"")}
+function syncApi(cfg,path,opts){
+  opts=opts||{};
+  var headers=opts.headers||{};
+  headers["apikey"]=cfg.key;headers["Content-Type"]="application/json";
+  if(cfg.token)headers["Authorization"]="Bearer "+cfg.token;
+  return fetch(syncBase(cfg)+path,{method:opts.method||"GET",headers:headers,body:opts.body||undefined});
+}
+function syncRefresh(cfg){
+  return fetch(syncBase(cfg)+"/auth/v1/token?grant_type=refresh_token",{
+    method:"POST",headers:{"apikey":cfg.key,"Content-Type":"application/json"},
+    body:JSON.stringify({refresh_token:cfg.rt})
+  }).then(function(r){return r.json()}).then(function(j){
+    if(j.access_token&&j.refresh_token){
+      cfg.token=j.access_token;cfg.rt=j.refresh_token;
+      if(j.user)cfg.uid=j.user.id;
+      saveSync(cfg);return true;
+    }
+    return false;
+  }).catch(function(){return false});
+}
+function syncAuthed(path,opts,retried){
+  var cfg=loadSync();
+  return syncApi(cfg,path,opts).then(function(r){
+    if(r.status===401&&!retried){
+      return syncRefresh(cfg).then(function(ok){return ok?syncAuthed(path,opts,true):r});
+    }
+    return r;
+  });
+}
+function syncSetStatus(msg,cls){
+  var el=$("syncStatus");
+  if(el){el.textContent=msg;el.style.color=cls==="err"?"var(--err)":cls==="ok"?"var(--ok)":"var(--sub)"}
+}
+function syncAuth(kind,email,pass){
+  var cfg=loadSync();
+  cfg.url=$("syncUrl").value.trim();cfg.key=$("syncKey").value.trim();
+  if(!cfg.url||!cfg.key){syncSetStatus("请先填写 Project URL 和 anon key","err");return Promise.reject("未配置")}
+  saveSync(cfg);
+  return fetch(syncBase(cfg)+(kind==="signup"?"/auth/v1/signup":"/auth/v1/token?grant_type=password"),{
+    method:"POST",headers:{"apikey":cfg.key,"Content-Type":"application/json"},
+    body:JSON.stringify({email:email,password:pass})
+  }).then(function(r){return r.json()}).then(function(j){
+    if(j.access_token&&j.user){
+      cfg.email=email;cfg.token=j.access_token;cfg.rt=j.refresh_token;cfg.uid=j.user.id;
+      if(!cfg.ts)cfg.ts={};
+      saveSync(cfg);return true;
+    }
+    if(kind==="signup")throw new Error(j.msg||j.error_description||"注册成功但需去邮箱确认，请先确认再登录");
+    throw new Error(j.error_description||j.msg||j.error||"登录失败，请检查邮箱和密码");
+  });
+}
+function syncPull(){
+  return syncAuthed("/rest/v1/sync_data?select=data_key,payload,updated_at").then(function(r){
+    if(!r.ok)return Promise.reject("同步失败("+r.status+")");
+    return r.json();
+  });
+}
+function syncPushRow(key,ts){
+  var cfg=loadSync();
+  return syncAuthed("/rest/v1/sync_data",{
+    method:"POST",headers:{"Prefer":"resolution=merge-duplicates"},
+    body:JSON.stringify([{user_id:cfg.uid,data_key:key,payload:{v:localStorage.getItem(SYNC_LOCAL[key])||""},updated_at:ts}])
+  }).then(function(r){return r.ok||r.status===201});
+}
+function syncNow(silent){
+  var cfg=loadSync();
+  if(!cfg.url||!cfg.key){if(!silent)syncSetStatus("未配置连接，请填写 Project URL 和 anon key","err");return Promise.resolve(false)}
+  if(!cfg.token||!cfg.uid){if(!silent)syncSetStatus("未登录","err");return Promise.resolve(false)}
+  if(!silent)syncSetStatus("同步中…");
+  return syncPull().then(function(rows){
+    var meta=cfg.ts||{};cfg.ts=meta;
+    var byKey={};
+    (rows||[]).forEach(function(r){byKey[r.data_key]=r});
+    var applied=[];
+    SYNC_KEYS.forEach(function(key){
+      var remote=byKey[key],remoteTs=remote?remote.updated_at:"",localTs=meta[key]||"";
+      var localMissing=localStorage.getItem(SYNC_LOCAL[key])===null;
+      if(remoteTs&&(localMissing||(!localTs||remoteTs>localTs))){
+        try{localStorage.setItem(SYNC_LOCAL[key],((remote.payload||{}).v)||"")}catch(e){}
+        applied.push(key);meta[key]=remoteTs;
+      }
+    });
+    var pushes=[];
+    SYNC_KEYS.forEach(function(key){
+      var remoteTs=(byKey[key]||{}).updated_at||"",localTs=meta[key]||"";
+      if(!remoteTs||localTs>remoteTs){
+        var now=new Date().toISOString();
+        meta[key]=now;
+        pushes.push(syncPushRow(key,now));
+      }
+    });
+    saveSync(cfg);
+    return Promise.all(pushes).then(function(){
+      if(applied.length){
+        toast("已从云端更新："+applied.join("、"));
+        if(applied.indexOf("sel")>=0){
+          var sel=localStorage.getItem(LS_SEL);
+          if(sel&&getBank(sel)){App.selectedBankId=sel;App.bank=getBank(sel)}
+        }
+        renderHome();refreshHeaderButtons();
+      }
+      syncSetStatus(applied.length?("已同步（更新 "+applied.join("、")+"）"):"已同步","ok");
+      return true;
+    });
+  }).catch(function(err){
+    if(!silent)syncSetStatus(String(err&&err.message?err.message:err),"err");
+    return false;
+  });
+}
+var _syncTimer=null;
+function scheduleSync(){clearTimeout(_syncTimer);_syncTimer=setTimeout(function(){syncNow(true)},1500)}
+function markDirty(key){
+  var cfg=loadSync();
+  if(!cfg.ts)cfg.ts={};
+  cfg.ts[key]=new Date().toISOString();
+  saveSync(cfg);
+  if(cfg.token&&cfg.uid)scheduleSync();
+}
+function syncUpdateUI(){
+  var cfg=loadSync(),loggedIn=!!(cfg.token&&cfg.uid);
+  $("syncLogoutBtn").classList.toggle("hidden",!loggedIn);
+  $("syncNowBtn").style.display=loggedIn?"":"none";
+  $("syncLoginBtn").style.display=loggedIn?"none":"";
+  $("syncSignupBtn").style.display=loggedIn?"none":"";
+  if(loggedIn)syncSetStatus("已登录："+(cfg.email||"")+"，数据自动同步","ok");
+  else syncSetStatus("未登录（自动同步关闭）","");
+}
+function syncInit(){
+  var cfg=loadSync();
+  $("syncUrl").value=cfg.url||"";
+  $("syncKey").value=cfg.key||"";
+  $("syncEmail").value=cfg.email||"";
+  if(cfg.token&&cfg.uid)syncNow(true);
+}
+
 /* 绑定事件 */
 function bind(){
   var drop=$("drop"),fileEl=$("file");
@@ -736,6 +923,27 @@ function bind(){
   $("shuffleChk").onchange=function(){if(App.session&&App.session.mode==="practice")restartSession($("wrongChk").checked)};
   $("wrongChk").onchange=function(){if(App.session&&App.session.mode==="practice")restartSession($("wrongChk").checked)};
   $("typeSel").onchange=function(){if(App.session&&App.session.mode==="practice")restartSession($("wrongChk").checked)};
+  $("syncBtn").onclick=function(){show("syncView");syncUpdateUI()};
+  $("syncBackBtn").onclick=function(){show("homeView")};
+  $("syncSignupBtn").onclick=function(){
+    var email=$("syncEmail").value.trim(),pass=$("syncPass").value;
+    if(!email||!pass){toast("请输入邮箱和密码");return}
+    syncAuth("signup",email,pass).then(function(){
+      syncUpdateUI();toast("注册成功，开始同步");syncNow(true);
+    }).catch(function(err){syncSetStatus(String(err.message||err),"err")});
+  };
+  $("syncLoginBtn").onclick=function(){
+    var email=$("syncEmail").value.trim(),pass=$("syncPass").value;
+    if(!email||!pass){toast("请输入邮箱和密码");return}
+    syncAuth("login",email,pass).then(function(){
+      syncUpdateUI();toast("登录成功，开始同步");syncNow(true);
+    }).catch(function(err){syncSetStatus(String(err.message||err),"err")});
+  };
+  $("syncLogoutBtn").onclick=function(){
+    var cfg=loadSync();cfg.token="";cfg.rt="";cfg.uid="";cfg.ts={};saveSync(cfg);
+    syncUpdateUI();toast("已退出登录");
+  };
+  $("syncNowBtn").onclick=function(){syncNow(false)};
 }
 
 /* 启动 */
@@ -750,6 +958,7 @@ function init(){
   var sel=localStorage.getItem(LS_SEL);
   if(sel&&getBank(sel)){App.selectedBankId=sel;App.bank=getBank(sel)}
   renderHome();refreshHeaderButtons();show("homeView");
+  syncInit();
 }
 init();
 })();
