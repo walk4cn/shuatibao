@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#3b6cf6">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>刷题宝</title>
 <style>
 :root{--bg:#f4f6fb;--card:#fff;--ink:#1f2933;--sub:#6b7785;--brand:#3b6cf6;--brand-d:#2f57c9;--ok:#1faa6b;--err:#e15554;--line:#e6eaf2;--soft:#eef2fb}
@@ -92,6 +95,47 @@ header .spacer{flex:1}
 .bc-del:hover{background:#fdeaea}
 .bc-meta{font-size:13px;color:var(--sub)}
 #selBanner{background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+
+/* ===== 手机端适配 ===== */
+*{-webkit-tap-highlight-color:transparent}
+.btn,.opt,.bank-card{touch-action:manipulation}
+@media (max-width:640px){
+  body{padding-bottom:env(safe-area-inset-bottom)}
+  header{padding:10px 12px;gap:8px;flex-wrap:wrap}
+  header h1{font-size:16px}
+  header .logo{font-size:20px}
+  header .btn{padding:7px 10px;font-size:13px;border-radius:8px}
+  .wrap{padding:12px}
+  .card{padding:16px;border-radius:12px}
+  #drop{padding:34px 14px}
+  .qtext{font-size:17px;margin-bottom:14px}
+  .opt{padding:13px 12px;font-size:15px}
+  .opt b{width:26px;height:26px}
+  .topbar{gap:8px}
+  .prog{min-width:90px}
+  .stat{font-size:12px}
+  .stat b{font-size:14px}
+  .nav .btn{flex:1}
+  .actions{flex-wrap:wrap}
+  .actions .btn{flex:1;min-width:0}
+  .actions #submitBtn{flex:2}
+  #explain{padding:12px 14px}
+  .ctrls{gap:12px 14px}
+  #selBanner{padding:12px;gap:10px}
+  #selBanner .btn{flex:1}
+  #selBanner>div{width:100%}
+  .bank-card{padding:12px 14px}
+  .bc-name{font-size:15px}
+  .hist-row{flex-wrap:wrap;gap:6px}
+  .hist-ops{width:100%;display:flex;gap:8px}
+  .hist-ops .btn{flex:1}
+  .done .score{font-size:40px}
+  .done .row{gap:20px}
+  .toast{left:12px;right:12px;transform:none;text-align:center;bottom:calc(16px + env(safe-area-inset-bottom))}
+  .fmt pre{font-size:11px}
+  .fmt{padding:12px}
+  h2{font-size:18px!important}
+}
 </style>
 </head>
 <body>
