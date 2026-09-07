@@ -166,6 +166,7 @@ header .spacer{flex:1}
       <button class="btn primary" id="homePracticeBtn" data-page-node-id="UuIWVu0TnCfE5ozMS6bFT3">题库练习</button>
       <button class="btn" id="homeExamBtn" data-page-node-id="e0p1O4Yw1UnO8k9Gv3U2PI">模拟考试</button>
       <button class="btn" id="homeClearProgBtn" data-page-node-id="1A6gdYTY20XrhEuSSpOWjz">清除练习进度</button>
+      <button class="btn" id="homeClearWrongBtn">清除错题集</button>
     </div>
     <div id="bankList" data-page-node-id="W9AO5VMCjhnpNVbyNJF3kZ"></div>
     <div id="homeEmpty" style="text-align:center;color:var(--sub);padding:40px 0" data-page-node-id="WDa8myQM9VrwBcWR2AG7Z2">
@@ -349,8 +350,33 @@ var App={bank:null,selectedBankId:null,session:null,sel:new Set(),userText:"",su
 /* 练习进度（每题作答记录）与错题集（答错题号）分开持久化、分开同步 */
 function loadProgMap(){try{return JSON.parse(localStorage.getItem(LS_PROG))||{}}catch(e){return{}}}
 function loadWrongMap(){try{return JSON.parse(localStorage.getItem(LS_WRONG))||{}}catch(e){return{}}}
+/* 错题同步状态表：{题库id:{题号:{w:0|1, ts}}}，w=1 在错题集 / w=0 已移除（墓碑）。
+   按题记录最后变更时间，推送/拉取按题取新者——答对移除、清空错题均可跨设备传播 */
+var LS_WRONG_ST="shuati_wrong_st_v1";
+function loadWrongSt(){try{return JSON.parse(localStorage.getItem(LS_WRONG_ST))||{}}catch(e){return{}}}
+function saveWrongSt(m){localStorage.setItem(LS_WRONG_ST,JSON.stringify(m))}
+function wrongStToIds(st){var out=[];Object.keys(st||{}).forEach(function(k){if(st[k]&&st[k].w){var n=Number(k);out.push(isNaN(n)?k:n)}});return out}
+function normalizeWrongSt(x,nowIso){
+  var out={};
+  if(Array.isArray(x)){x.forEach(function(i){out[String(i)]={w:1,ts:nowIso}});return out}
+  if(x&&typeof x==="object"){Object.keys(x).forEach(function(k){var e=x[k];if(e&&typeof e==="object"&&(e.w===0||e.w===1)&&typeof e.ts==="string")out[k]={w:e.w,ts:e.ts}})}
+  return out;
+}
 function saveProgMap(m,bid){localStorage.setItem(LS_PROG,JSON.stringify(m));markDirty("prog:"+(bid||App.selectedBankId||""))}
-function saveWrongMap(m,bid){localStorage.setItem(LS_WRONG,JSON.stringify(m));markDirty("wrong:"+(bid||App.selectedBankId||""))}
+function saveWrongMap(m,bid){
+  localStorage.setItem(LS_WRONG,JSON.stringify(m));
+  if(bid){   /* 同步维护该题库的状态表：新增记 w:1，移除记 w:0（墓碑），未变的保留原时间戳 */
+    var stMap=loadWrongSt(),st=stMap[bid]||{},now=new Date().toISOString();
+    var cur={};(Array.isArray(m[bid])?m[bid]:[]).forEach(function(i){cur[String(i)]=1});
+    Object.keys(st).forEach(function(k){
+      if(cur[k]){if(!(st[k]&&st[k].w))st[k]={w:1,ts:now}}
+      else{if(st[k]&&st[k].w)st[k]={w:0,ts:now}}
+    });
+    Object.keys(cur).forEach(function(k){if(!st[k])st[k]={w:1,ts:now}});
+    stMap[bid]=st;saveWrongSt(stMap);
+  }
+  markDirty("wrong:"+(bid||App.selectedBankId||""));
+}
 function commitPrac(){
   if(!App.selectedBankId)return;
   var bid=App.selectedBankId;
@@ -387,6 +413,17 @@ function clearPracProgress(){
   if($("studyView")&&!$("studyView").classList.contains("hidden")){show("homeView")}
   renderHome();refreshHeaderButtons();
   toast("已清除《"+name+"》的练习进度");
+}
+/* 清除当前题库的错题集（练习作答记录保留） */
+function clearWrongSet(){
+  if(!App.selectedBankId){toast("请先选择题库");return}
+  var name=App.bank?App.bank.name:"当前题库";
+  if(!confirm("确定清除《"+name+"》的错题集吗？\n错题集将清空，练习作答记录保留。"))return;
+  App.prac.wrongIds=new Set();
+  commitPrac();
+  markOw("wrong:"+App.selectedBankId);   /* 主动清除须覆盖云端，确保清空传播到所有设备 */
+  renderHome();refreshHeaderButtons();
+  toast("已清除《"+name+"》的错题集");
 }
 
 var $=function(id){return document.getElementById(id)};
@@ -938,12 +975,20 @@ function payloadFor(key,remoteRow,authoritative){
   }
   bid=keyOf("wrong",key);
   if(bid!==null){
-    var lw=loadWrongMap()[bid]||[];
-    if(authoritative)return {v:JSON.stringify(lw)};   /* 主动清除：整体覆盖上云，不与云端合并 */
-    var rw=remoteRow?parseJSONorNull((remoteRow.payload||{}).v||""):null;
-    var seen={},out=[];
-    (Array.isArray(rw)?rw:[]).concat(Array.isArray(lw)?lw:[]).forEach(function(x){var s=String(x);if(!seen[s]){seen[s]=1;out.push(x)}});
-    return {v:JSON.stringify(out)};
+    var lid=loadWrongMap()[bid]||[];
+    var stMap=loadWrongSt(),lst=stMap[bid]||{};
+    /* 主动清除/权威覆盖：整体以本地状态表为准上云 */
+    if(authoritative)return {v:JSON.stringify(lst)};
+    var remote=remoteRow?parseJSONorNull((remoteRow.payload||{}).v||""):null;
+    var nowIso=new Date().toISOString();
+    var rs=normalizeWrongSt(remote,nowIso);   /* 兼容旧版数组格式 */
+    var merged={};
+    Object.keys(lst).forEach(function(k){merged[k]=lst[k]});
+    Object.keys(rs).forEach(function(k){      /* 按题取时间戳新者：移除墓碑也能传播 */
+      var a=merged[k],b=rs[k];
+      if(!a||((b&&b.ts)>(a.ts||"")))merged[k]=b;
+    });
+    return {v:JSON.stringify(merged)};
   }
   return {v:localStorage.getItem(SYNC_LOCAL[key])||""};
 }
@@ -1040,7 +1085,14 @@ function syncNow(silent){
       if(!(remoteTs>(meta[k]||"")))return;   /* 云端更新才覆盖（本地有无数据均可） */
       var val=parseJSONorNull(((r.payload||{}).v)||"");
       if(val===null)return;
-      store[bid]=pre==="prog"?val:(Array.isArray(val)?val:[]);
+      if(pre==="wrong"){
+        var nowIso=new Date().toISOString();
+        var rst=normalizeWrongSt(val,nowIso);          /* 兼容旧版数组格式 */
+        store[bid]=wrongStToIds(rst);
+        var wstMap=loadWrongSt();wstMap[bid]=rst;saveWrongSt(wstMap);
+      }else{
+        store[bid]=val;
+      }
       try{localStorage.setItem(storeName,JSON.stringify(store))}catch(e){return}
       meta[k]=remoteTs;markApplied(pre==="prog"?"练习进度":"错题集");
       if(App.selectedBankId===bid)loadPracFor(bid);
@@ -1124,6 +1176,7 @@ function bind(){
   $("importNewBtn").onclick=function(){show("importView")};
   $("homePracticeBtn").onclick=function(){startSession(false)};
   $("homeClearProgBtn").onclick=clearPracProgress;
+  $("homeClearWrongBtn").onclick=clearWrongSet;
   $("homeExamBtn").onclick=startExam;
   $("practiceBtn").onclick=function(){startSession(false)};
   $("examBtn").onclick=startExam;
