@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#3b6cf6">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<html lang="zh-CN" data-page-node-id="LNeOewZdvwc8P2G97MyhG9">
+<head data-page-node-id="BvBlIO5HhcCRpdZdDKA1MT">
+<meta charset="UTF-8" data-page-node-id="A0TAkpNbprNhh1DaASMY81">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" data-page-node-id="ZF8ltLy2dFSEU7Y4ekSEom">
+<meta name="theme-color" content="#3b6cf6" data-page-node-id="MzcPcKvzTHwVJEN3aI8eVH">
+<meta name="apple-mobile-web-app-capable" content="yes" data-page-node-id="ighd6oYSBTkuYQaHJ983XG">
+<meta name="apple-mobile-web-app-status-bar-style" content="default" data-page-node-id="GBjZEjdEcE2ecm0kMTqmEF">
 <title>刷题宝</title>
 <style>
 :root{--bg:#f4f6fb;--card:#fff;--ink:#1f2933;--sub:#6b7785;--brand:#3b6cf6;--brand-d:#2f57c9;--ok:#1faa6b;--err:#e15554;--line:#e6eaf2;--soft:#eef2fb}
@@ -141,176 +141,176 @@ header .spacer{flex:1}
 }
 </style>
 </head>
-<body>
-<header>
-  <span class="logo">📚</span><h1>刷题宝</h1>  <span class="spacer"></span>
-  <button class="btn ghost" id="homeBtn">🏠 首页</button>
-  <button class="btn ghost hidden" id="practiceBtn">题库练习</button>
-  <button class="btn ghost hidden" id="examBtn">模拟考试</button>
-  <button class="btn ghost hidden" id="histBtn">历史成绩</button>
-  <button class="btn ghost" id="syncBtn">☁ 同步</button>
+<body data-page-node-id="37r1Aq1TEKuOXdtGD5ulE6">
+<header data-page-node-id="pehJA9x4MJN4vBwU3yHPrS">
+  <span class="logo" data-page-node-id="s504SLWKrbZhjaeulKxq5K">📚</span><h1 data-page-node-id="THCocNDbq2ZX8WHlCt6ex1">刷题宝</h1>  <span class="spacer" data-page-node-id="QOunBhhRaDpCwuZIfcT1DB"></span>
+  <button class="btn ghost" id="homeBtn" data-page-node-id="RJeJ4uPpAeuOeavKmbpqkd">🏠 首页</button>
+  <button class="btn ghost hidden" id="practiceBtn" data-page-node-id="7W3yGVFc1QEnGkoMcMbYiD">题库练习</button>
+  <button class="btn ghost hidden" id="examBtn" data-page-node-id="A7uCvhfKzlW1BJLzDGGS5P">模拟考试</button>
+  <button class="btn ghost hidden" id="histBtn" data-page-node-id="wXPosZO12bdDQMG2SAeqYy">历史成绩</button>
+  <button class="btn ghost" id="syncBtn" data-page-node-id="spZrlULt3701Ts95SXFzYD">☁ 同步</button>
 </header>
 
-<div class="wrap">
+<div class="wrap" data-page-node-id="Qi7rGfgNzxMkEEbdTADAXi">
   <!-- 首页：题库列表 -->
-  <div id="homeView" class="card hidden">
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
-      <h2 style="margin:0;font-size:20px;font-weight:700">我的题库</h2>
-      <span class="grow"></span>
-      <button class="btn" id="homeTplBtn">下载模板</button>
-      <button class="btn primary" id="importNewBtn">＋ 导入新题库</button>
+  <div id="homeView" class="card hidden" data-page-node-id="OkLzuGM89cGrPy1fHADyok">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px" data-page-node-id="1fn1FPOwj2jICDgnQayvWG">
+      <h2 style="margin:0;font-size:20px;font-weight:700" data-page-node-id="tyjYOeKBkvwAp8HR3Aus8t">我的题库</h2>
+      <span class="grow" data-page-node-id="SXhKE211o9zGdMHEsmdiB7"></span>
+      <button class="btn" id="homeTplBtn" data-page-node-id="QD9ckgxwdCMpTGjwiUIBkG">下载模板</button>
+      <button class="btn primary" id="importNewBtn" data-page-node-id="FcMj3QdjeKk7VYXhih9tp8">＋ 导入新题库</button>
     </div>
-    <div id="selBanner" class="hidden">
-      <div style="font-weight:700">当前题库：<span id="selName" style="color:var(--brand-d)"></span> <span id="selProg" style="font-weight:400;color:var(--sub);font-size:13px"></span></div>
-      <span class="grow"></span>
-      <button class="btn primary" id="homePracticeBtn">题库练习</button>
-      <button class="btn" id="homeExamBtn">模拟考试</button>
-      <button class="btn" id="homeClearProgBtn">清除练习进度</button>
+    <div id="selBanner" class="hidden" data-page-node-id="8KuGK7QKqLELEOvwwXUB1g">
+      <div style="font-weight:700" data-page-node-id="DsqblWZW1jxsgoC8H0LfbU">当前题库：<span id="selName" style="color:var(--brand-d)" data-page-node-id="HbgaJcsPYkwCRD9FEpbdKj"></span> <span id="selProg" style="font-weight:400;color:var(--sub);font-size:13px" data-page-node-id="bxuh0hpGtCzzYMfd5PBbr2"></span></div>
+      <span class="grow" data-page-node-id="niKpAmUVF1VhMCaWJqg5Qw"></span>
+      <button class="btn primary" id="homePracticeBtn" data-page-node-id="UuIWVu0TnCfE5ozMS6bFT3">题库练习</button>
+      <button class="btn" id="homeExamBtn" data-page-node-id="e0p1O4Yw1UnO8k9Gv3U2PI">模拟考试</button>
+      <button class="btn" id="homeClearProgBtn" data-page-node-id="1A6gdYTY20XrhEuSSpOWjz">清除练习进度</button>
     </div>
-    <div id="bankList"></div>
-    <div id="homeEmpty" style="text-align:center;color:var(--sub);padding:40px 0">
-      <div style="font-size:42px">📚</div>
-      <p style="margin-top:8px">还没有题库，点击上方「导入新题库」开始吧</p>
+    <div id="bankList" data-page-node-id="W9AO5VMCjhnpNVbyNJF3kZ"></div>
+    <div id="homeEmpty" style="text-align:center;color:var(--sub);padding:40px 0" data-page-node-id="WDa8myQM9VrwBcWR2AG7Z2">
+      <div style="font-size:42px" data-page-node-id="a6zQiT1L7ZIzmS9fIhJHsl">📚</div>
+      <p style="margin-top:8px" data-page-node-id="s7ycOUi4Frce3ylU6HkWWC">还没有题库，点击上方「导入新题库」开始吧</p>
     </div>
   </div>
 
   <!-- 云同步页 -->
-  <div id="syncView" class="card hidden">
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
-      <h2 style="margin:0;font-size:20px;font-weight:700">☁ 云同步</h2>
-      <span class="grow"></span>
-      <button class="btn" id="syncBackBtn">← 返回</button>
+  <div id="syncView" class="card hidden" data-page-node-id="5Fs4dgMgbDFu2Abb2PYNPx">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px" data-page-node-id="hsvisAiUjcFJjHFOHHPUHN">
+      <h2 style="margin:0;font-size:20px;font-weight:700" data-page-node-id="ZqQDORLTjW2jnYPg6CVTQO">☁ 云同步</h2>
+      <span class="grow" data-page-node-id="IivYN1vAYf7JcB0hzDhVFM"></span>
+      <button class="btn" id="syncBackBtn" data-page-node-id="GXWPyaOSBcOIQodGEBuRFz">← 返回</button>
     </div>
-    <div class="fmt">
-      <b>连接设置</b>
-      <p style="color:var(--sub);margin:6px 0 10px">填入阿里云同步服务地址（形如 <code>http://1.2.3.4:8080</code>）。若当前页面就是从该服务打开的，留空即表示用本站，无需配置。</p>
-      <label style="display:block;margin:8px 0">服务地址
-        <input id="syncUrl" style="width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px" placeholder="http://1.2.3.4:8080（本机打开可留空）"></label>
-      <label style="display:block;margin:8px 0">访问密钥<span style="color:var(--sub)">（服务端未设置则留空）</span>
-        <input id="syncKey" style="width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px" placeholder="可留空"></label>
+    <div class="fmt" data-page-node-id="pHpKdsLfOoyeP64BpIF8mg">
+      <b data-page-node-id="f5fQ24kyYOJHvZXcDCwtXw">连接设置</b>
+      <p style="color:var(--sub);margin:6px 0 10px" data-page-node-id="g9pwy44EumVFFI5mET5nNn">填入阿里云同步服务地址（形如 <code data-page-node-id="UaTUhGGc3BLMbStDihsPTb">http://1.2.3.4:8080</code>）。若当前页面就是从该服务打开的，留空即表示用本站，无需配置。</p>
+      <label style="display:block;margin:8px 0" data-page-node-id="kGsoeWWrIjznMUCjm0QpYO">服务地址
+        <input id="syncUrl" style="width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px" placeholder="http://1.2.3.4:8080（本机打开可留空）" data-page-node-id="3FbRFDIVD16Sna29qlUYwO"></label>
+      <label style="display:block;margin:8px 0" data-page-node-id="iOegOkEX801skx9Ck2Eg5k">访问密钥<span style="color:var(--sub)" data-page-node-id="JFH3RdDaYv9dwi44DkIjBo">（服务端未设置则留空）</span>
+        <input id="syncKey" style="width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px" placeholder="可留空" data-page-node-id="FhHWD9qq9r2KiytvcyszmO"></label>
     </div>
-    <div class="fmt">
-      <b>账号登录</b><span style="color:var(--sub)">（多终端使用同一邮箱账号即可互通同步：题库、当前选择、考试记录、错题集、练习进度）</span>
-      <label style="display:block;margin:8px 0">邮箱
-        <input id="syncEmail" type="email" style="width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px" placeholder="you@example.com"></label>
-      <label style="display:block;margin:8px 0">密码
-        <input id="syncPass" type="password" style="width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px" placeholder="至少 6 位"></label>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
-        <button class="btn primary" id="syncSignupBtn">注册并登录</button>
-        <button class="btn" id="syncLoginBtn">登录</button>
-        <button class="btn ghost" id="syncLogoutBtn">退出登录</button>
-        <button class="btn ghost" id="syncNowBtn">立即同步</button>
+    <div class="fmt" data-page-node-id="powW1MRyhbyG9NAj0ZMt3j">
+      <b data-page-node-id="HFTAps8QEAM8DeZ00P6zvR">账号登录</b><span style="color:var(--sub)" data-page-node-id="4kvaVAaokOZnkKU8BaA57B">（多终端使用同一邮箱账号即可互通同步：题库、当前选择、考试记录、错题集、练习进度）</span>
+      <label style="display:block;margin:8px 0" data-page-node-id="jKIDNBxBKA1xG8ulUftj2N">邮箱
+        <input id="syncEmail" type="email" style="width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px" placeholder="you@example.com" data-page-node-id="mlv86qGrUoeKJqGo4KVBLN"></label>
+      <label style="display:block;margin:8px 0" data-page-node-id="6prhJ9HFbqJWPP3nkqF7fx">密码
+        <input id="syncPass" type="password" style="width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px" placeholder="至少 6 位" data-page-node-id="debHEdajkTcIqHT14Oxt39"></label>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px" data-page-node-id="IWBhsNzbdyCuh7o1kkBok4">
+        <button class="btn primary" id="syncSignupBtn" data-page-node-id="naPqzjhDp3zv6bANsg9Bgq">注册并登录</button>
+        <button class="btn" id="syncLoginBtn" data-page-node-id="1XXVmuhbFlc2zNY3KIknJx">登录</button>
+        <button class="btn ghost" id="syncLogoutBtn" data-page-node-id="dJSCEBH4KT2323Ufb1ZcSk">退出登录</button>
+        <button class="btn ghost" id="syncNowBtn" data-page-node-id="X9jjJ4ZnqYsVk1PAn2zQTB">立即同步</button>
       </div>
-      <p id="syncStatus" style="margin-top:10px;color:var(--sub)"></p>
+      <p id="syncStatus" style="margin-top:10px;color:var(--sub)" data-page-node-id="8BZUCanfzx9hwOd8bvhhA0"></p>
     </div>
   </div>
 
   <!-- 导入页 -->
-  <div id="importView" class="card hidden">
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
-      <h2 style="margin:0;font-size:20px;font-weight:700">导入题库</h2>
-      <span class="grow"></span>
-      <button class="btn" id="importBackBtn">← 返回</button>
+  <div id="importView" class="card hidden" data-page-node-id="zU9CQ1Wd21cEByxviKbFrB">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px" data-page-node-id="w9Ar76NoJerJa4l8sSoJFI">
+      <h2 style="margin:0;font-size:20px;font-weight:700" data-page-node-id="yB4ESVD6HLARH2pDcXFC4p">导入题库</h2>
+      <span class="grow" data-page-node-id="Fup7wf46AhcaylggJvytIW"></span>
+      <button class="btn" id="importBackBtn" data-page-node-id="YUBFHn9kw4oZf2x7fzrmu2">← 返回</button>
     </div>
-    <div id="drop">
-      <div class="big">📥</div>
-      <p><b>点击选择</b> 或 <b>拖拽</b> Excel / CSV 题库文件到此处</p>
-      <p>支持 .xlsx / .xls / .csv</p>
-      <input type="file" id="file" accept=".xlsx,.xls,.csv" class="hidden">
+    <div id="drop" data-page-node-id="X4ISGHUjbhbhkCAGJCpf7Q">
+      <div class="big" data-page-node-id="e1fw61j1YKUlJNTeC11nDb">📥</div>
+      <p data-page-node-id="Pq6ktlQL7KFb5Cpfb7rezV"><b data-page-node-id="WadcjJ4n6wMw2mYtwN6urQ">点击选择</b> 或 <b data-page-node-id="2Xtz3CkmkaLGO4KJmcjmTh">拖拽</b> Excel / CSV 题库文件到此处</p>
+      <p data-page-node-id="KOFM3jMC7aColbAg0nOCVi">支持 .xlsx / .xls / .csv</p>
+      <input type="file" id="file" accept=".xlsx,.xls,.csv" class="hidden" data-page-node-id="q0KyNOHokb4zIt2EKlMJbG">
     </div>
-    <div class="err" id="importErr"></div>
-    <div id="importDiag" class="fmt hidden">
-      <b>📋 导入诊断（前 5 题）</b>
-      <table id="diagTable"></table>
+    <div class="err" id="importErr" data-page-node-id="ZXObVrXeW5Uf9Z46to1LEY"></div>
+    <div id="importDiag" class="fmt hidden" data-page-node-id="7LU0NdXPBc76rnDSB5k2gq">
+      <b data-page-node-id="R3otrWpm3BCgQxcMEKsmO6">📋 导入诊断（前 5 题）</b>
+      <table id="diagTable" data-page-node-id="vl5un0DV37oiHJg9fGF4pM"></table>
     </div>
-    <div class="fmt">
-      <b>题库格式：</b>第一行表头，系统自动识别列名（含关键字即可，顺序不限）。
-      <table>
-        <tr><th>用途</th><th>可识别表头</th></tr>
-        <tr><td>题目</td><td>题目 / 题干 / 问题 / 试题</td></tr>
-        <tr><td>选项</td><td>A B C D E F（或 选项A…）</td></tr>
-        <tr><td>答案</td><td>答案 / 正确答案 / 标准答案</td></tr>
-        <tr><td>题型(可选)</td><td>题型 / 类型</td></tr>
-        <tr><td>解析(可选)</td><td>解析 / 答案解析</td></tr>
+    <div class="fmt" data-page-node-id="1ytGri9QiPP5cYBap30uZb">
+      <b data-page-node-id="zynxWInY0WLoE8wHwl9R9Z">题库格式：</b>第一行表头，系统自动识别列名（含关键字即可，顺序不限）。
+      <table data-page-node-id="rWeyrYyXsBHoJ2DRJVc3fM">
+        <tr data-page-node-id="tYX6FmFgjv38tJqrnHkeJW"><th data-page-node-id="MlE10tbfGVtPcFnaNVLlbF">用途</th><th data-page-node-id="18aiGzPLhL73Z3k787hqsW">可识别表头</th></tr>
+        <tr data-page-node-id="ZiuvAIyI2eEAhjaMT2g8xr"><td data-page-node-id="APdWSPGlAjGpVChjbKEt2u">题目</td><td data-page-node-id="rwWuxFSiRMzsTzhu8pwQ03">题目 / 题干 / 问题 / 试题</td></tr>
+        <tr data-page-node-id="Rap1umFbhjfRCJK4tTLpFj"><td data-page-node-id="fUOJ06PO6RRaB3Uk4TbnuK">选项</td><td data-page-node-id="PI2PQ2oVSmPzjIzSqRPRso">A B C D E F（或 选项A…）</td></tr>
+        <tr data-page-node-id="tzDARcDwy1ctewpxk8Y5mM"><td data-page-node-id="1JgJUhHKkDjMxNAMVAfGGu">答案</td><td data-page-node-id="lrD86nIxa6oqoCzgvpfBw3">答案 / 正确答案 / 标准答案</td></tr>
+        <tr data-page-node-id="4fJz4rXzbZdGiar9Hc8QYI"><td data-page-node-id="j8aGzfOcRTccOgHp2AOjE9">题型(可选)</td><td data-page-node-id="yUiBxBFE5G1lyZ0XcsWPZr">题型 / 类型</td></tr>
+        <tr data-page-node-id="lnPzwF4PqyP6ccgCM7Kt85"><td data-page-node-id="YJFTv1gEnNYY6SEjaErrId">解析(可选)</td><td data-page-node-id="zzQYIPCgrfqkCfS6oSLN7r">解析 / 答案解析</td></tr>
       </table>
-      <p>判断题答案：<b>正确/对/√/A</b>（A=正确）、<b>错误/错/×/B</b>（B=错误）；多选答案用英文逗号，如 <b>AC</b></p>
+      <p data-page-node-id="TEVCm4iFsynzcylt5GitTf">判断题答案：<b data-page-node-id="SSFO8R3ftGLCMEL43sEYLk">正确/对/√/A</b>（A=正确）、<b data-page-node-id="x2SqLb2D4r9Aj3V4xCImnU">错误/错/×/B</b>（B=错误）；多选答案用英文逗号，如 <b data-page-node-id="F6NjQogfGgdEpZjP5CprBr">AC</b></p>
     </div>
   </div>
 
   <!-- 练习页 -->
-  <div id="studyView" class="card hidden">
-    <div class="topbar">
-      <div class="prog"><i id="progBar"></i></div>
-      <div class="stat">进度 <b id="progText">0/0</b></div>
-      <div class="stat">正确率 <b id="accText">—</b></div>
-      <div class="stat">✔<b id="okText">0</b> ✘<b id="noText">0</b></div>
+  <div id="studyView" class="card hidden" data-page-node-id="cs3wHG5cdONY7oCP5w4xc0">
+    <div class="topbar" data-page-node-id="kbYzBTQFrektooQmgvKQQo">
+      <div class="prog" data-page-node-id="Eugp4mwNgSVOrRI23D91ap"><i id="progBar" data-page-node-id="pAODzj68aZ87NTeEFFmdgk"></i></div>
+      <div class="stat" data-page-node-id="mpHPlk2uZBl9qcCwhgYcDI">进度 <b id="progText" data-page-node-id="TcJBdfsqHSqCHcNTnKJgGb">0/0</b></div>
+      <div class="stat" data-page-node-id="WuzuOD12zL7L4qsK5No8ck">正确率 <b id="accText" data-page-node-id="uLeMeACUm3Bd0X0WRd39Bo">—</b></div>
+      <div class="stat" data-page-node-id="gYdPL2Am9prGb8AAxPonBN">✔<b id="okText" data-page-node-id="MoSAHoAyvqZL2l4H6WQhLi">0</b> ✘<b id="noText" data-page-node-id="OWQPXKsjBiuvNRgvGkeEQL">0</b></div>
     </div>
-    <div id="qTag" class="tag single">单选</div>
-    <div class="qtext" id="qText"></div>
-    <div id="options"></div>
-    <div id="explain"><div class="h">解析</div><div id="explainText"></div></div>
-    <div class="nav">
-      <button class="btn" id="prevBtn">← 上一题</button>
-      <span class="grow"></span>
-      <button class="btn" id="nextBtn">下一题 →</button>
+    <div id="qTag" class="tag single" data-page-node-id="b4yQkqOCS37E4ja84LZl5W">单选</div>
+    <div class="qtext" id="qText" data-page-node-id="yJAnYaX9yfALKZo09G7ajY"></div>
+    <div id="options" data-page-node-id="emH38kwbuK8DSIavDnD87F"></div>
+    <div id="explain" data-page-node-id="AqtfNlTKkECy0uAnYS8v2P"><div class="h" data-page-node-id="gqBXmGI1Cwe8EwKCKgOJVQ">解析</div><div id="explainText" data-page-node-id="nJuE26Q0Kr2oTBjBjCSgnv"></div></div>
+    <div class="nav" data-page-node-id="biecRl6iBkHdSDD3wk88aZ">
+      <button class="btn" id="prevBtn" data-page-node-id="vyHt2jgN7J7sNhn3qfMo4W">← 上一题</button>
+      <span class="grow" data-page-node-id="ngZWg5ZjzPOb5hDELDAus4"></span>
+      <button class="btn" id="nextBtn" data-page-node-id="GSD0W5FMWP8bltlGePT5fB">下一题 →</button>
     </div>
-    <div class="actions">
-      <span id="fb" class="feedback"></span>
-      <span class="grow"></span>
-      <button class="btn" id="explainBtn">看解析</button>
-      <button class="btn" id="answerBtn">查看答案</button>
-      <button class="btn primary" id="submitBtn">提交答案</button>
+    <div class="actions" data-page-node-id="nDwUjrXgXcQ0DvbykNguNs">
+      <span id="fb" class="feedback" data-page-node-id="dS5OsqlDkYcV9DjGMdp6SU"></span>
+      <span class="grow" data-page-node-id="IyxJxQdebMQrZZxbBLqnru"></span>
+      <button class="btn" id="explainBtn" data-page-node-id="GQtmN0sNBOVuNC4TlnT8N5">看解析</button>
+      <button class="btn" id="answerBtn" data-page-node-id="vC2dW2eKFmO4jcumSrTG6t">查看答案</button>
+      <button class="btn primary" id="submitBtn" data-page-node-id="aI07x2swbmvEJbmCWI4qpL">提交答案</button>
     </div>
-    <div class="ctrls" id="ctrls">
-      <label>题型
-        <select id="typeSel"><option value="all">全部</option><option value="single">单选</option><option value="multiple">多选</option><option value="judge">判断</option><option value="fill">填空</option></select>
+    <div class="ctrls" id="ctrls" data-page-node-id="7GT5UyBbgOBWlmyeZQo6Bu">
+      <label data-page-node-id="xaKCf30Fm6GOCwCDGC0Em5">题型
+        <select id="typeSel" data-page-node-id="gKR3tUZsWrC5jujrC3zltg"><option value="all" data-page-node-id="OnfOiif3lu0QSUUS76L4xk">全部</option><option value="single" data-page-node-id="VKDYHQHkJRBzvkZxugPDH5">单选</option><option value="multiple" data-page-node-id="S7ByWAK0Ny9JqsGOB2fH8h">多选</option><option value="judge" data-page-node-id="pZ4ou4pxS1Iju6Nqddhg5a">判断</option><option value="fill" data-page-node-id="CVFebZC0iy0kKT6vlITVEb">填空</option></select>
       </label>
-      <label><input type="checkbox" id="shuffleChk"> 随机顺序</label>
-      <label><input type="checkbox" id="wrongChk"> 只练错题</label>
-      <label><input type="checkbox" id="autoChk"> 自动下一题</label>
+      <label data-page-node-id="oExOJX0sStPxVEOc1jCNoH"><input type="checkbox" id="shuffleChk" data-page-node-id="Pr5788KRUtD4FiEANz8XaX"> 随机顺序</label>
+      <label data-page-node-id="i9qSROoUjY84iVuV6u6MA8"><input type="checkbox" id="wrongChk" data-page-node-id="MLPy3o8CG5RFTtohwbZk6D"> 只练错题</label>
+      <label data-page-node-id="bNiqdBjiVSZKSKdolaFOTs"><input type="checkbox" id="autoChk" data-page-node-id="huj2lIWcCEbG3DzmMaAVuq"> 自动下一题</label>
     </div>
   </div>
 
   <!-- 完成页 -->
-  <div id="doneView" class="card hidden">
-    <div class="done">
-      <div class="score" id="doneScore">0%</div>
-      <div class="line" id="doneLine"></div>
-      <div class="row">
-        <div>答对<b id="doneOk" style="color:var(--ok)">0</b></div>
-        <div>答错<b id="doneNo" style="color:var(--err)">0</b></div>
-        <div>总计<b id="doneTotal">0</b></div>
+  <div id="doneView" class="card hidden" data-page-node-id="A5THTDNBJZbDKxT32iSw1k">
+    <div class="done" data-page-node-id="fPSiuhXRDl6d8DuAdYiW2X">
+      <div class="score" id="doneScore" data-page-node-id="GNUAq2ZdsGCGhySfPmhtjj">0%</div>
+      <div class="line" id="doneLine" data-page-node-id="HiHoDOGCen4YZNlBNIQD77"></div>
+      <div class="row" data-page-node-id="55zXmWtlTfcAUJDK4RDAU9">
+        <div data-page-node-id="6AHnu9DGMKAt9NMf68SARm">答对<b id="doneOk" style="color:var(--ok)" data-page-node-id="fY3pvaA6PsIFYZHasA5Nyw">0</b></div>
+        <div data-page-node-id="K8FN8zGtcDyTUGCF4ud0DQ">答错<b id="doneNo" style="color:var(--err)" data-page-node-id="DH1F4GkRDFujWGC6F5kCej">0</b></div>
+        <div data-page-node-id="YFACCrAxPCC2HH6B0yxCID">总计<b id="doneTotal" data-page-node-id="2O7E1AurWQkHS6zcIbH1DB">0</b></div>
       </div>
-      <button class="btn primary" id="againBtn">再来一遍</button>
-      <button class="btn" id="wrongAgainBtn">只练错题</button>
-      <button class="btn hidden" id="examWrongBtn">查看本次错题</button>
-      <button class="btn" id="historyBtn">历史成绩</button>
-      <button class="btn" id="backBtn">返回首页</button>
+      <button class="btn primary" id="againBtn" data-page-node-id="zBY9iCvopCbNfBoHCKRXpw">再来一遍</button>
+      <button class="btn" id="wrongAgainBtn" data-page-node-id="wOYPqy8yFC17zshxpplSUf">只练错题</button>
+      <button class="btn hidden" id="examWrongBtn" data-page-node-id="9AYAFYSm17gOrbHNtvJdYY">查看本次错题</button>
+      <button class="btn" id="historyBtn" data-page-node-id="MgO3dboju2lqB7JDG6MnQw">历史成绩</button>
+      <button class="btn" id="backBtn" data-page-node-id="PF3lm8vYTve1N8DoqETkl0">返回首页</button>
     </div>
   </div>
 
   <!-- 历史成绩 -->
-  <div id="historyView" class="card hidden">
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
-      <h2 style="margin:0;font-size:18px;font-weight:700">模拟考试成绩</h2>
-      <span class="grow"></span>
-      <button class="btn" id="historyBackBtn">返回</button>
+  <div id="historyView" class="card hidden" data-page-node-id="vErSNIUlDLnaVfkCCuTLhx">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px" data-page-node-id="RxAqjIr5uSyLBpCY3QQZ1S">
+      <h2 style="margin:0;font-size:18px;font-weight:700" data-page-node-id="HJgk7YAQ4IphdJC0W7GE7k">模拟考试成绩</h2>
+      <span class="grow" data-page-node-id="2FrOlZDgD5Dey1WpqkmID1"></span>
+      <button class="btn" id="historyBackBtn" data-page-node-id="ZTbjcQA0uceaBkyJQ2e1TA">返回</button>
     </div>
-    <div id="historyList"></div>
+    <div id="historyList" data-page-node-id="IjU4VPMNTueb0OiB2gN0cD"></div>
   </div>
 
   <!-- 错题详情 -->
-  <div id="examWrongView" class="card hidden">
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
-      <h2 style="margin:0;font-size:18px;font-weight:700">本次错题</h2>
-      <span class="grow"></span>
-      <button class="btn" id="examWrongBackBtn">返回</button>
+  <div id="examWrongView" class="card hidden" data-page-node-id="LqXMy6tVH6RMYvl5Ranh4H">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px" data-page-node-id="OSlHJ2YrUdr2wlFcCE0hC7">
+      <h2 style="margin:0;font-size:18px;font-weight:700" data-page-node-id="zWDTrK49POKiKCEO8JsssL">本次错题</h2>
+      <span class="grow" data-page-node-id="oLornXVtzURpPt85ZCGJ8K"></span>
+      <button class="btn" id="examWrongBackBtn" data-page-node-id="z7w50IzEfEk8OzUUzXe2Jo">返回</button>
     </div>
-    <div id="examWrongList"></div>
+    <div id="examWrongList" data-page-node-id="lL99yYVkQpDPIRMEV5zy4M"></div>
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast" data-page-node-id="RpdQj8uMvj2ALjVzTchU08"></div>
 <script>
 /* SheetJS (xlsx.full.min.js) 内联 */
 /*! xlsx.js (C) 2013-present SheetJS -- http://sheetjs.com */
@@ -349,12 +349,13 @@ var App={bank:null,selectedBankId:null,session:null,sel:new Set(),userText:"",su
 /* 练习进度（每题作答记录）与错题集（答错题号）分开持久化、分开同步 */
 function loadProgMap(){try{return JSON.parse(localStorage.getItem(LS_PROG))||{}}catch(e){return{}}}
 function loadWrongMap(){try{return JSON.parse(localStorage.getItem(LS_WRONG))||{}}catch(e){return{}}}
-function saveProgMap(m){localStorage.setItem(LS_PROG,JSON.stringify(m));markDirty("prog")}
-function saveWrongMap(m){localStorage.setItem(LS_WRONG,JSON.stringify(m));markDirty("wrong")}
+function saveProgMap(m,bid){localStorage.setItem(LS_PROG,JSON.stringify(m));markDirty("prog:"+(bid||App.selectedBankId||""))}
+function saveWrongMap(m,bid){localStorage.setItem(LS_WRONG,JSON.stringify(m));markDirty("wrong:"+(bid||App.selectedBankId||""))}
 function commitPrac(){
   if(!App.selectedBankId)return;
-  var pm=loadProgMap();pm[App.selectedBankId]=App.prac.results;saveProgMap(pm);
-  var wm=loadWrongMap();wm[App.selectedBankId]=[...App.prac.wrongIds];saveWrongMap(wm);
+  var bid=App.selectedBankId;
+  var pm=loadProgMap();pm[bid]=App.prac.results;saveProgMap(pm,bid);
+  var wm=loadWrongMap();wm[bid]=[...App.prac.wrongIds];saveWrongMap(wm,bid);
 }
 function loadPracFor(bankId){
   var pm=loadProgMap(),wm=loadWrongMap();
@@ -468,8 +469,8 @@ function delBank(id){
   if(!confirm("确定删除该题库？"))return;
   var banks=loadBanks().filter(function(x){return x.id!==id});
   saveBanks(banks);
-  var pm=loadProgMap();if(pm[id]){delete pm[id];saveProgMap(pm)}
-  var wm=loadWrongMap();if(wm[id]){delete wm[id];saveWrongMap(wm)}
+  var pm=loadProgMap();if(pm[id]){delete pm[id];saveProgMap(pm,id)}
+  var wm=loadWrongMap();if(wm[id]){delete wm[id];saveWrongMap(wm,id)}
   if(App.selectedBankId===id){App.bank=null;App.selectedBankId=null;localStorage.removeItem(LS_SEL)}
   refreshHeaderButtons();renderHome();
 }
@@ -856,7 +857,11 @@ function downloadTemplate(){
 
 /* ===== 云同步（自建服务，接口兼容 Supabase 子集） ===== */
 function syncLocal(){return location.protocol==="file:"}   // 本地双击打开时必须显式填地址
-var LS_SYNC="shuati_sync_v1",SYNC_KEYS=["banks","sel","history","wrong","prog"],SYNC_LOCAL={banks:LS_BANKS,sel:LS_SEL,history:EXAM_HISTORY_KEY,wrong:LS_WRONG,prog:LS_PROG};
+var LS_SYNC="shuati_sync_v1",BASE_KEYS=["banks","sel","history"],SYNC_LOCAL={banks:LS_BANKS,sel:LS_SEL,history:EXAM_HISTORY_KEY};
+/* 练习进度/错题集按题库拆分同步：prog:<bankId> / wrong:<bankId>，避免整包覆盖导致清零 */
+function keyOf(pre,k){return k&&k.lastIndexOf(pre+":",0)===0?k.slice(pre.length+1):null}
+function parseJSONorNull(s){try{var o=JSON.parse(s);return o}catch(e){return null}}
+function nonEmpty(v){return v!==undefined&&v!==null&&!(typeof v==="object"&&Object.keys(v).length===0)&&v!==""}
 function loadSync(){try{return JSON.parse(localStorage.getItem(LS_SYNC))||{}}catch(e){return{}}}
 function saveSync(o){localStorage.setItem(LS_SYNC,JSON.stringify(o));return o}
 function syncBase(cfg){return cfg.url.replace(/\/+$/,"")}
@@ -903,8 +908,10 @@ function syncAuth(kind,email,pass){
     body:JSON.stringify({email:email,password:pass})
   }).then(function(r){return r.json()}).then(function(j){
     if(j.access_token&&j.user){
+      if(cfg.email&&cfg.email!==email){cfg.ts={};cfg.dirty={};cfg.legacyMerged=false}  /* 换账号登录：丢弃旧账号的同步记账，防止串号覆盖 */
       cfg.email=email;cfg.token=j.access_token;cfg.rt=j.refresh_token;cfg.uid=j.user.id;
       if(!cfg.ts)cfg.ts={};
+      if(!cfg.dirty)cfg.dirty={};
       saveSync(cfg);return true;
     }
     if(kind==="signup")throw new Error(j.msg||j.error_description||"注册成功但需去邮箱确认，请先确认再登录");
@@ -917,12 +924,25 @@ function syncPull(){
     return r.json();
   });
 }
-function syncPushRow(key,ts){
+function payloadFor(key){
+  var bid=keyOf("prog",key);
+  if(bid!==null)return {v:JSON.stringify(loadProgMap()[bid]||{})};
+  bid=keyOf("wrong",key);
+  if(bid!==null)return {v:JSON.stringify(loadWrongMap()[bid]||[])};
+  return {v:localStorage.getItem(SYNC_LOCAL[key])||""};
+}
+function syncPushRow(key){
   var cfg=loadSync();
   return syncAuthed("/rest/v1/sync_data",{
     method:"POST",headers:{"Prefer":"resolution=merge-duplicates"},
-    body:JSON.stringify([{user_id:cfg.uid,data_key:key,payload:{v:localStorage.getItem(SYNC_LOCAL[key])||""},updated_at:ts}])
-  }).then(function(r){return r.ok||r.status===201});
+    body:JSON.stringify([{user_id:cfg.uid,data_key:key,payload:payloadFor(key)}])
+  }).then(function(r){
+    if(!r.ok&&r.status!==201)return null;
+    return r.json().then(function(list){
+      var row=Array.isArray(list)?list[0]:list;
+      return (row&&row.updated_at)?row.updated_at:new Date().toISOString();
+    });
+  }).catch(function(){return null});   /* 失败返回 null，调用方保留脏标记待重试 */
 }
 /* 拉取时兼容旧版合并数据：云端 wrong 行可能仍是 {results,wrongIds} 组合格式，需拆回错题集/练习进度 */
 function normalizeRemote(key,raw){
@@ -944,41 +964,92 @@ function syncNow(silent){
   if(!cfg.url&&syncLocal()){if(!silent)syncSetStatus("未配置连接，请填写同步服务地址","err");return Promise.resolve(false)}
   if(!cfg.token||!cfg.uid){if(!silent)syncSetStatus("未登录","err");return Promise.resolve(false)}
   if(!silent)syncSetStatus("同步中…");
+  var meta=cfg.ts||{};cfg.ts=meta;
+  var dirty=cfg.dirty||{};cfg.dirty=dirty;
+  /* 拉取前快照：拉取期间本地被修改的数据本轮不覆盖 */
+  var snapProg=localStorage.getItem(LS_PROG),snapWrong=localStorage.getItem(LS_WRONG);
+  var snap={};BASE_KEYS.forEach(function(k){snap[k]=localStorage.getItem(SYNC_LOCAL[k])});
   return syncPull().then(function(rows){
-    var meta=cfg.ts||{};cfg.ts=meta;
-    var byKey={};
-    (rows||[]).forEach(function(r){byKey[r.data_key]=r});
-    var applied=[];
-    SYNC_KEYS.forEach(function(key){
-      var remote=byKey[key],remoteTs=remote?remote.updated_at:"",localTs=meta[key]||"";
-      var localMissing=localStorage.getItem(SYNC_LOCAL[key])===null;
-      if(remoteTs&&(localMissing||(!localTs||remoteTs>localTs))){
-        try{localStorage.setItem(SYNC_LOCAL[key],normalizeRemote(key,((remote.payload||{}).v)||""))}catch(e){}
-        applied.push(key);meta[key]=remoteTs;
-      }
+    var byKey={};(rows||[]).forEach(function(r){byKey[r.data_key]=r});
+    var applied=[];   /* 存中文标签，直接用于提示 */
+    var LABEL={banks:"题库",sel:"当前选择",history:"考试记录"};
+    function markApplied(label){if(label&&applied.indexOf(label)<0)applied.push(label)}
+
+    /* 1) 基础键：banks / sel / history（整值，云端新才覆盖） */
+    BASE_KEYS.forEach(function(key){
+      var remote=byKey[key];if(!remote)return;
+      var remoteTs=remote.updated_at||"";
+      if(dirty[key])return;                                   /* 本地有未推送的修改，稍后推送 */
+      var cur=localStorage.getItem(SYNC_LOCAL[key]);
+      if(cur!==snap[key])return;                              /* 拉取期间被修改，本轮跳过 */
+      if(cur!==null&&cur!==""&&meta[key]===undefined){dirty[key]=true;return}  /* 本地已有数据但从未同步过：保本地，改为上推 */
+      if(!(cur===null||meta[key]===undefined||remoteTs>meta[key]))return;
+      try{localStorage.setItem(SYNC_LOCAL[key],((remote.payload||{}).v)||"")}catch(e){return}
+      meta[key]=remoteTs;markApplied(LABEL[key]);
     });
-    var pushes=[];
-    SYNC_KEYS.forEach(function(key){
-      var remoteTs=(byKey[key]||{}).updated_at||"",localTs=meta[key]||"";
-      if(!remoteTs||localTs>remoteTs){
-        var now=new Date().toISOString();
-        meta[key]=now;
-        pushes.push(syncPushRow(key,now));
-      }
+
+    /* 2) 旧版整包 prog/wrong 行迁移：按题库拆成独立行，每台设备只处理一次 */
+    if(!cfg.legacyMerged&&(byKey["prog"]||byKey["wrong"])){
+      [["prog",LS_PROG,"练习进度"],["wrong",LS_WRONG,"错题集"]].forEach(function(pair){
+        var legacy=byKey[pair[0]];if(!legacy||!legacy.payload)return;
+        var raw=parseJSONorNull(normalizeRemote(pair[0],legacy.payload.v||""));
+        if(!raw||typeof raw!=="object"||Array.isArray(raw))return;
+        Object.keys(raw).forEach(function(bid){
+          var k=pair[0]+":"+bid;
+          if(meta[k]!==undefined||dirty[k])return;
+          var store=parseJSONorNull(localStorage.getItem(pair[1]));
+          if(!store||typeof store!=="object"||Array.isArray(store)){store={}}
+          if(!nonEmpty(store[bid])&&nonEmpty(raw[bid])){      /* 本地无该题库数据时才采纳旧数据 */
+            store[bid]=raw[bid];localStorage.setItem(pair[1],JSON.stringify(store));markApplied(pair[2]);
+          }
+          if(nonEmpty(store[bid]))dirty[k]=true;              /* 以按库行形式推上云 */
+        });
+      });
+      cfg.legacyMerged=true;
+    }
+
+    /* 3) 按题库行：prog:<id> / wrong:<id>（单题库粒度合并，杜绝整包清零） */
+    (rows||[]).forEach(function(r){
+      var pre=keyOf("prog",r.data_key)!==null?"prog":(keyOf("wrong",r.data_key)!==null?"wrong":null);
+      if(!pre)return;
+      var bid=keyOf(pre,r.data_key),k=r.data_key;
+      var remoteTs=r.updated_at||"";
+      if(dirty[k])return;                                     /* 本地有未推送修改：不覆盖 */
+      var storeName=pre==="prog"?LS_PROG:LS_WRONG;
+      var snapRaw=pre==="prog"?snapProg:snapWrong;
+      var store=parseJSONorNull(localStorage.getItem(storeName));
+      if(!store||typeof store!=="object"||Array.isArray(store)){store={}}
+      var hasData=nonEmpty(store[bid]);
+      if(hasData&&(localStorage.getItem(storeName)!==snapRaw||meta[k]===undefined)){dirty[k]=true;return}  /* 本地新改动或从未同步：保本地 */
+      if(!(hasData===false&&(meta[k]===undefined||remoteTs>meta[k])))return;
+      var val=parseJSONorNull(((r.payload||{}).v)||"");
+      if(val===null)return;
+      store[bid]=pre==="prog"?val:(Array.isArray(val)?val:[]);
+      try{localStorage.setItem(storeName,JSON.stringify(store))}catch(e){return}
+      meta[k]=remoteTs;markApplied(pre==="prog"?"练习进度":"错题集");
+      if(App.selectedBankId===bid)loadPracFor(bid);
     });
+
+    /* 4) 推送所有本地修改过的键；成功才记录服务端时间，失败保留脏标记下次重试 */
+    var pushKeys=Object.keys(dirty).filter(function(k){return dirty[k]});
     saveSync(cfg);
+    var pushes=pushKeys.map(function(k){
+      return syncPushRow(k).then(function(ts){
+        if(ts){meta[k]=ts;dirty[k]=false}else{dirty[k]=true}
+      });
+    });
     return Promise.all(pushes).then(function(){
+      saveSync(cfg);
       if(applied.length){
-        var LABEL={banks:"题库",sel:"当前选择",history:"考试记录",wrong:"错题集",prog:"练习进度"};
-        toast("已从云端更新："+applied.map(function(k){return LABEL[k]||k}).join("、"));
-        if(applied.indexOf("sel")>=0){
+        toast("已从云端更新："+applied.join("、"));
+        if(applied.indexOf("当前选择")>=0){
           var sel=localStorage.getItem(LS_SEL);
           if(sel&&getBank(sel)){App.selectedBankId=sel;App.bank=getBank(sel)}
         }
-        if((applied.indexOf("wrong")>=0||applied.indexOf("prog")>=0)&&App.selectedBankId)loadPracFor(App.selectedBankId);
+        if((applied.indexOf("练习进度")>=0||applied.indexOf("错题集")>=0)&&App.selectedBankId)loadPracFor(App.selectedBankId);
         renderHome();refreshHeaderButtons();
       }
-      syncSetStatus(applied.length?("已同步（更新 "+applied.map(function(k){return LABEL[k]||k}).join("、")+"）"):"已同步","ok");
+      syncSetStatus(applied.length?("已同步（更新 "+applied.join("、")+"）"):"已同步","ok");
       return true;
     });
   }).catch(function(err){
@@ -989,9 +1060,10 @@ function syncNow(silent){
 var _syncTimer=null;
 function scheduleSync(){clearTimeout(_syncTimer);_syncTimer=setTimeout(function(){syncNow(true)},1500)}
 function markDirty(key){
+  if(!key||key.charAt(key.length-1)===":")return;   /* 无题库 id 时不记账 */
   var cfg=loadSync();
-  if(!cfg.ts)cfg.ts={};
-  cfg.ts[key]=new Date().toISOString();
+  if(!cfg.dirty)cfg.dirty={};
+  cfg.dirty[key]=true;
   saveSync(cfg);
   if(cfg.token&&cfg.uid)scheduleSync();
 }

@@ -56,18 +56,18 @@ async function main() {
   let rows = await r.json();
   chk('拉取到 1 行且内容正确', rows.length === 1 && rows[0].data_key === 'banks' && rows[0].payload.v === '{"a":1}', rows);
 
-  // 旧时间戳不应覆盖新数据
-  const tsNew = new Date(Date.now() + 60000).toISOString();
+  // 服务端时间戳为准：客户端传的 updated_at 被忽略，统一以服务器接收时间落库并返回
   await fetch(B + '/rest/v1/sync_data', {
     method: 'POST', headers: { Authorization: 'Bearer ' + at, apikey: AK, 'Content-Type': 'application/json', Prefer: 'resolution=merge-duplicates' },
-    body: JSON.stringify([{ user_id: uid, data_key: 'banks', payload: { v: '{"a":2}' }, updated_at: tsNew }])
+    body: JSON.stringify([{ user_id: uid, data_key: 'banks', payload: { v: '{"a":2}' }, updated_at: '1999-01-01T00:00:00.000Z' }])
   });
-  await fetch(B + '/rest/v1/sync_data', {
+  const pushRes = await (await fetch(B + '/rest/v1/sync_data', {
     method: 'POST', headers: { Authorization: 'Bearer ' + at, apikey: AK, 'Content-Type': 'application/json' },
-    body: JSON.stringify([{ user_id: uid, data_key: 'banks', payload: { v: '{"a":STALE}' }, updated_at: ts1 }])
-  });
+    body: JSON.stringify([{ user_id: uid, data_key: 'banks', payload: { v: '{"a":STALE}' }, updated_at: '1999-01-01T00:00:00.000Z' }])
+  })).json();
+  chk('推送返回服务端落库时间', Array.isArray(pushRes) && pushRes[0] && /^\d{4}-/.test(pushRes[0].updated_at || '') && (pushRes[0].updated_at || '').indexOf('1999') === -1, pushRes[0]);
   rows = await (await fetch(B + '/rest/v1/sync_data', { headers: { Authorization: 'Bearer ' + at, apikey: AK } })).json();
-  chk('旧时间戳不覆盖新数据', rows[0].payload.v === '{"a":2}', rows[0]);
+  chk('后推送覆盖先推送（服务端时间为准）', rows[0].payload.v === '{"a":STALE}', rows[0]);
 
   j = await (await fetch(B + '/auth/v1/token?grant_type=refresh_token', {
     method: 'POST', headers: { 'Content-Type': 'application/json', apikey: AK }, body: JSON.stringify({ refresh_token: rt })

@@ -167,15 +167,15 @@ function handlePush(req, res, b) {
   if (!uid) return err(res, 401, '未登录或登录已过期');
   const list = Array.isArray(b) ? b : [b];
   db.rows[uid] = db.rows[uid] || {};
+  const saved = [];
   list.forEach(function (r) {
     if (!r || typeof r.data_key !== 'string') return;
-    const cur = db.rows[uid][r.data_key];
-    const ts = String(r.updated_at || new Date().toISOString());
-    // 旧设备晚到时不覆盖新数据
-    if (cur && cur.updated_at && ts < cur.updated_at) return;
+    // 统一使用服务器时间作为 updated_at，避免各设备时钟偏差导致新旧误判
+    const ts = new Date().toISOString();
     db.rows[uid][r.data_key] = { payload: r.payload === undefined ? {} : r.payload, updated_at: ts };
+    saved.push({ user_id: uid, data_key: r.data_key, payload: db.rows[uid][r.data_key].payload, updated_at: ts });
   });
-  return save().then(function () { json(res, 201, list); });
+  return save().then(function () { json(res, 201, saved); });
 }
 
 /* ---------- 静态站点 ---------- */
