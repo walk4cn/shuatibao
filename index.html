@@ -924,18 +924,30 @@ function syncPull(){
     return r.json();
   });
 }
-function payloadFor(key){
+function payloadFor(key,remoteRow){
   var bid=keyOf("prog",key);
-  if(bid!==null)return {v:JSON.stringify(loadProgMap()[bid]||{})};
+  if(bid!==null){
+    var local=loadProgMap()[bid];
+    if(!local||typeof local!=="object"||Array.isArray(local))local={};
+    var remote=remoteRow?parseJSONorNull((remoteRow.payload||{}).v||""):null;
+    /* 按题合并：同题以本地为准，云端多出的题保留 —— 两台设备各自做的题不互删 */
+    var merged=(remote&&typeof remote==="object"&&!Array.isArray(remote))?Object.assign({},remote,local):local;
+    return {v:JSON.stringify(merged)};
+  }
   bid=keyOf("wrong",key);
-  if(bid!==null)return {v:JSON.stringify(loadWrongMap()[bid]||[])};
+  if(bid!==null){
+    var lw=loadWrongMap()[bid]||[],rw=remoteRow?parseJSONorNull((remoteRow.payload||{}).v||""):null;
+    var seen={},out=[];
+    (Array.isArray(rw)?rw:[]).concat(Array.isArray(lw)?lw:[]).forEach(function(x){var s=String(x);if(!seen[s]){seen[s]=1;out.push(x)}});
+    return {v:JSON.stringify(out)};
+  }
   return {v:localStorage.getItem(SYNC_LOCAL[key])||""};
 }
-function syncPushRow(key){
+function syncPushRow(key,remoteRow){
   var cfg=loadSync();
   return syncAuthed("/rest/v1/sync_data",{
     method:"POST",headers:{"Prefer":"resolution=merge-duplicates"},
-    body:JSON.stringify([{user_id:cfg.uid,data_key:key,payload:payloadFor(key)}])
+    body:JSON.stringify([{user_id:cfg.uid,data_key:key,payload:payloadFor(key,remoteRow)}])
   }).then(function(r){
     if(!r.ok&&r.status!==201)return null;
     return r.json().then(function(list){
@@ -1021,7 +1033,7 @@ function syncNow(silent){
       if(!store||typeof store!=="object"||Array.isArray(store)){store={}}
       var hasData=nonEmpty(store[bid]);
       if(hasData&&(localStorage.getItem(storeName)!==snapRaw||meta[k]===undefined)){dirty[k]=true;return}  /* 本地新改动或从未同步：保本地 */
-      if(!(hasData===false&&(meta[k]===undefined||remoteTs>meta[k])))return;
+      if(!(remoteTs>(meta[k]||"")))return;   /* 云端更新才覆盖（本地有无数据均可） */
       var val=parseJSONorNull(((r.payload||{}).v)||"");
       if(val===null)return;
       store[bid]=pre==="prog"?val:(Array.isArray(val)?val:[]);
@@ -1034,7 +1046,7 @@ function syncNow(silent){
     var pushKeys=Object.keys(dirty).filter(function(k){return dirty[k]});
     saveSync(cfg);
     var pushes=pushKeys.map(function(k){
-      return syncPushRow(k).then(function(ts){
+      return syncPushRow(k,byKey[k]).then(function(ts){
         if(ts){meta[k]=ts;dirty[k]=false}else{dirty[k]=true}
       });
     });
