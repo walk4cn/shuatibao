@@ -383,6 +383,7 @@ function clearPracProgress(){
   App.prac.results={};
   App.session=null;
   commitPrac();
+  markOw("prog:"+App.selectedBankId);   /* 主动清除须覆盖云端，否则合并逻辑会把云端进度"复活" */
   if($("studyView")&&!$("studyView").classList.contains("hidden")){show("homeView")}
   renderHome();refreshHeaderButtons();
   toast("已清除《"+name+"》的练习进度");
@@ -656,10 +657,10 @@ function startSession(onlyWrong){
   App.session={order:order,pos:0,correct:correct,wrong:wrong,answered:answered,wrongIds:wrongIds,results:results,mode:"practice"};
   if(!onlyWrong){
     if(answered.size===order.length){
-      // 本轮已全部作答：清空本题库进度，开启新一轮
-      App.prac.results={};commitPrac();
+      // 本轮已全部作答：保留作答记录（不清零、不上传空进度），从头再练一轮
       App.session.results={};App.session.answered=new Set();App.session.correct=0;App.session.wrong=0;
-      toast("本题库已练习完，已开启新一轮");
+      App.session.pos=0;
+      toast("本题库已完成一轮，将从头再练");
     }else if(answered.size){
       var found=false;
       for(var p=0;p<order.length;p++){if(!answered.has(order[p])){App.session.pos=p;found=true;break}}
@@ -908,7 +909,7 @@ function syncAuth(kind,email,pass){
     body:JSON.stringify({email:email,password:pass})
   }).then(function(r){return r.json()}).then(function(j){
     if(j.access_token&&j.user){
-      if(cfg.email&&cfg.email!==email){cfg.ts={};cfg.dirty={};cfg.legacyMerged=false}  /* 换账号登录：丢弃旧账号的同步记账，防止串号覆盖 */
+      if(cfg.email&&cfg.email!==email){cfg.ts={};cfg.dirty={};cfg.ow={};cfg.legacyMerged=false}  /* 换账号登录：丢弃旧账号的同步记账，防止串号覆盖 */
       cfg.email=email;cfg.token=j.access_token;cfg.rt=j.refresh_token;cfg.uid=j.user.id;
       if(!cfg.ts)cfg.ts={};
       if(!cfg.dirty)cfg.dirty={};
@@ -924,11 +925,12 @@ function syncPull(){
     return r.json();
   });
 }
-function payloadFor(key,remoteRow){
+function payloadFor(key,remoteRow,authoritative){
   var bid=keyOf("prog",key);
   if(bid!==null){
     var local=loadProgMap()[bid];
     if(!local||typeof local!=="object"||Array.isArray(local))local={};
+    if(authoritative)return {v:JSON.stringify(local)};   /* 主动清除：整体覆盖上云，不与云端合并 */
     var remote=remoteRow?parseJSONorNull((remoteRow.payload||{}).v||""):null;
     /* 按题合并：同题以本地为准，云端多出的题保留 —— 两台设备各自做的题不互删 */
     var merged=(remote&&typeof remote==="object"&&!Array.isArray(remote))?Object.assign({},remote,local):local;
@@ -936,18 +938,20 @@ function payloadFor(key,remoteRow){
   }
   bid=keyOf("wrong",key);
   if(bid!==null){
-    var lw=loadWrongMap()[bid]||[],rw=remoteRow?parseJSONorNull((remoteRow.payload||{}).v||""):null;
+    var lw=loadWrongMap()[bid]||[];
+    if(authoritative)return {v:JSON.stringify(lw)};   /* 主动清除：整体覆盖上云，不与云端合并 */
+    var rw=remoteRow?parseJSONorNull((remoteRow.payload||{}).v||""):null;
     var seen={},out=[];
     (Array.isArray(rw)?rw:[]).concat(Array.isArray(lw)?lw:[]).forEach(function(x){var s=String(x);if(!seen[s]){seen[s]=1;out.push(x)}});
     return {v:JSON.stringify(out)};
   }
   return {v:localStorage.getItem(SYNC_LOCAL[key])||""};
 }
-function syncPushRow(key,remoteRow){
+function syncPushRow(key,remoteRow,authoritative){
   var cfg=loadSync();
   return syncAuthed("/rest/v1/sync_data",{
     method:"POST",headers:{"Prefer":"resolution=merge-duplicates"},
-    body:JSON.stringify([{user_id:cfg.uid,data_key:key,payload:payloadFor(key,remoteRow)}])
+    body:JSON.stringify([{user_id:cfg.uid,data_key:key,payload:payloadFor(key,remoteRow,authoritative)}])
   }).then(function(r){
     if(!r.ok&&r.status!==201)return null;
     return r.json().then(function(list){
@@ -1046,8 +1050,9 @@ function syncNow(silent){
     var pushKeys=Object.keys(dirty).filter(function(k){return dirty[k]});
     saveSync(cfg);
     var pushes=pushKeys.map(function(k){
-      return syncPushRow(k,byKey[k]).then(function(ts){
-        if(ts){meta[k]=ts;dirty[k]=false}else{dirty[k]=true}
+      var ow=dirty[k]==="ow";
+      return syncPushRow(k,byKey[k],ow).then(function(ts){
+        if(ts){meta[k]=ts;dirty[k]=false;if(ow&&cfg.ow)delete cfg.ow[k]}else{dirty[k]=true}
       });
     });
     return Promise.all(pushes).then(function(){
@@ -1075,7 +1080,17 @@ function markDirty(key){
   if(!key||key.charAt(key.length-1)===":")return;   /* 无题库 id 时不记账 */
   var cfg=loadSync();
   if(!cfg.dirty)cfg.dirty={};
-  cfg.dirty[key]=true;
+  if(cfg.dirty[key]!=="ow")cfg.dirty[key]=true;     /* 权威覆盖标记不被普通修改降级 */
+  saveSync(cfg);
+  if(cfg.token&&cfg.uid)scheduleSync();
+}
+/* 权威覆盖：本键的下次推送不与云端合并，整体以本地为准（用于"清除练习进度"等用户主动删除） */
+function markOw(key){
+  if(!key||key.charAt(key.length-1)===":")return;
+  var cfg=loadSync();
+  if(!cfg.dirty)cfg.dirty={};
+  if(!cfg.ow)cfg.ow={};
+  cfg.dirty[key]="ow";cfg.ow[key]=true;
   saveSync(cfg);
   if(cfg.token&&cfg.uid)scheduleSync();
 }
