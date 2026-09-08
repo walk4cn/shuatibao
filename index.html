@@ -920,14 +920,21 @@ function syncRefresh(cfg){
       if(j.user)cfg.uid=j.user.id;
       saveSync(cfg);return true;
     }
-    return false;
-  }).catch(function(){return false});
+    return j.error||j.message||"续期失败";
+  }).catch(function(){return "网络错误，无法续期"});
 }
 function syncAuthed(path,opts,retried){
   var cfg=loadSync();
   return syncApi(cfg,path,opts).then(function(r){
     if(r.status===401&&!retried){
-      return syncRefresh(cfg).then(function(ok){return ok?syncAuthed(path,opts,true):r});
+      return syncRefresh(cfg).then(function(res){
+        if(res===true)return syncAuthed(path,opts,true);
+        // 续期失败=token 已死：清掉本地票据（保留邮箱/密钥/地址），UI 立即回到未登录状态
+        var c=loadSync();c.token="";c.rt="";c.uid="";saveSync(c);
+        syncUpdateUI();
+        var s=String(res);
+        throw new Error(s.indexOf("apikey")>=0?"访问密钥不正确，请检查同步设置里的密钥":"登录已过期，请重新登录");
+      });
     }
     return r;
   });

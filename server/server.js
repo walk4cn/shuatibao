@@ -39,7 +39,13 @@ function save() {
     Object.keys(db.tokens).forEach(function (t) { if (db.tokens[t].exp < now) delete db.tokens[t]; });
     Object.keys(db.refresh).forEach(function (t) { if (db.refresh[t].exp < now) delete db.refresh[t]; });
     return fsp.writeFile(DB_FILE + '.tmp', JSON.stringify(db))
-      .then(function () { return fsp.rename(DB_FILE + '.tmp', DB_FILE); });
+      .then(function () { return fsp.rename(DB_FILE + '.tmp', DB_FILE); })
+      .catch(function (e) {
+        // Windows 下目标文件被占用（杀毒/备份/并发读）时 rename 会失败，
+        // 回退为直接覆盖写，避免续期 token 等最新状态静默丢失（重启后回到旧 token）
+        console.error('[save] rename 失败，回退直写:', e.message);
+        return fsp.writeFile(DB_FILE, JSON.stringify(db));
+      });
   }).catch(function (e) { console.error('[save]', e.message); });
   return writeChain;
 }
