@@ -80,6 +80,18 @@ function uidOf(req) {
   return s.uid;
 }
 
+/* ---------- 认证日志（审计 L2：401/限流写一行，便于溯源） ---------- */
+const LOG_FILE = path.join(DATA_DIR, 'auth.log');
+function logAuth(event, req, detail) {
+  const line = new Date().toISOString() + '\t' + (req.socket.remoteAddress || '?') + '\t' + event + (detail ? '\t' + detail : '');
+  console.log('[auth] ' + line);
+  fsp.appendFile(LOG_FILE, line + '\n').catch(function () { /* 日志失败不影响请求 */ });
+}
+function tokHint(h) {   // 只取前 8 位，避免完整密钥/token 进日志
+  const s = String(h || '');
+  return s ? s.slice(0, 8) + (s.length > 8 ? '…(' + s.length + ')' : '') : '(空)';
+}
+
 /* ---------- HTTP 辅助 ---------- */
 function cors(res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -142,7 +154,10 @@ function handleToken(req, res, b, q) {
   const grant = q.get('grant_type') || 'password';
   if (grant === 'refresh_token') {
     const s = db.refresh[String(b.refresh_token || '')];
-    if (!s || s.exp < Date.now()) return err(res, 400, '登录已过期，请重新登录');
+    if (!s || s.exp < Date.now()) {
+      logAuth('refresh_reject', req, 'rt=' + tokHint(b.refresh_token));
+      return err(res, 400, '登录已过期，请重新登录');
+    }
     delete db.refresh[b.refresh_token];
     const sess = issue(s.uid);
     return save().then(function () { json(res, 200, sess); });
@@ -152,6 +167,7 @@ function handleToken(req, res, b, q) {
   const u = uid && db.users[uid];
   if (!u || !verifyPass(String(b.password || ''), u)) {
     bumpFail(req.socket.remoteAddress || '?');
+    logAuth('password_mismatch', req, 'email=' + email);
     return err(res, 400, '邮箱或密码错误');
   }
   const sess = issue(u.id);
@@ -160,7 +176,11 @@ function handleToken(req, res, b, q) {
 
 function handlePull(req, res) {
   const uid = uidOf(req);
-  if (!uid) return err(res, 401, '未登录或登录已过期');
+  if (!uid) {
+    const m = /^Bearer\s+(.+)$/i.exec(req.headers.authorization || '');
+    logAuth('token_invalid', req, 'pull at=' + tokHint(m ? m[1] : ''));
+    return err(res, 401, '未登录或登录已过期');
+  }
   const rows = db.rows[uid] || {};
   const out = Object.keys(rows).map(function (k) {
     return { user_id: uid, data_key: k, payload: rows[k].payload, updated_at: rows[k].updated_at };
@@ -170,7 +190,11 @@ function handlePull(req, res) {
 
 function handlePush(req, res, b) {
   const uid = uidOf(req);
-  if (!uid) return err(res, 401, '未登录或登录已过期');
+  if (!uid) {
+    const m = /^Bearer\s+(.+)$/i.exec(req.headers.authorization || '');
+    logAuth('token_invalid', req, 'push at=' + tokHint(m ? m[1] : ''));
+    return err(res, 401, '未登录或登录已过期');
+  }
   const list = Array.isArray(b) ? b : [b];
   db.rows[uid] = db.rows[uid] || {};
   const saved = [];
@@ -211,15 +235,16 @@ const server = http.createServer(function (req, res) {
   if (p === '/health') return json(res, 200, { ok: true, users: Object.keys(db.users).length });
   // 接口需要 apikey（服务端未设置 SYNC_API_KEY 时不校验），静态站点不校验
   if ((p.startsWith('/auth/') || p.startsWith('/rest/')) && API_KEY && req.headers.apikey !== API_KEY) {
+    logAuth('apikey_mismatch', req, p + ' got=' + tokHint(req.headers.apikey));
     return err(res, 401, 'apikey 不正确');
   }
 
   if (p === '/auth/v1/signup' && req.method === 'POST') {
-    if (throttled(req.socket.remoteAddress || '?')) return err(res, 429, '尝试过于频繁，请稍后再试');
+    if (throttled(req.socket.remoteAddress || '?')) { logAuth('rate_limited', req, 'signup'); return err(res, 429, '尝试过于频繁，请稍后再试'); }
     return body(req).then(function (b) { handleSignup(req, res, b); }).catch(function (e) { err(res, 400, e.message); });
   }
   if (p === '/auth/v1/token' && req.method === 'POST') {
-    if (throttled(req.socket.remoteAddress || '?')) return err(res, 429, '尝试过于频繁，请稍后再试');
+    if (throttled(req.socket.remoteAddress || '?')) { logAuth('rate_limited', req, 'token'); return err(res, 429, '尝试过于频繁，请稍后再试'); }
     return body(req).then(function (b) { handleToken(req, res, b, u.searchParams); }).catch(function (e) { err(res, 400, e.message); });
   }
   if (p === '/auth/v1/logout' && req.method === 'POST') {
