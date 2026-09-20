@@ -3,7 +3,7 @@ chcp 65001 >nul
 cd /d "%~dp0"
 
 rem 端口：改成你在阿里云安全组里放行的那个
-if "%PORT%"=="" set PORT=5002
+if "%PORT%"=="" set PORT=5003
 rem 访问密钥：留空=不校验；建议设一个，客户端「访问密钥」填同样的值
 if "%SYNC_API_KEY%"=="" set SYNC_API_KEY=
 

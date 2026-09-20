@@ -14,7 +14,7 @@ const fsp = require('node:fs/promises');
 const path = require('node:path');
 const crypto = require('node:crypto');
 
-const PORT = Number(process.env.PORT || 5002);
+const PORT = Number(process.env.PORT || 5003);
 const HOST = process.env.HOST || '0.0.0.0';
 const API_KEY = process.env.SYNC_API_KEY || '';        // 可选：留空则不校验 apikey
 const ROOT = path.resolve(__dirname, '..');            // 站点根目录（index.html 所在）
