@@ -1,2 +1,6 @@
 # WorkBuddy 项目数据目录
 .workbuddy/
+
+# WorkBuddy 新版数据目录：memory 里含明文 SYNC_API_KEY，
+# 本仓库是公开仓库，绝不能入库（否则密钥会公开泄漏）
+.workbuddy-ai/
